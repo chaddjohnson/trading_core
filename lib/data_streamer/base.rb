@@ -1,5 +1,9 @@
 module DataStreamer
   class Base
+    def initialize(account)
+      @account = account
+    end
+
     def stream_quotes(symbols, callback)
       raise NotImplementedError
     end

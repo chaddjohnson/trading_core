@@ -1,6 +1,7 @@
 module DataStreamer
   class Tradeking < Base
-    def initialize(credentials)
+    def initialize(account, credentials)
+      super(account)
       @credentials = credentials
     end
 

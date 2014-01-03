@@ -7,13 +7,30 @@ class Account < ActiveRecord::Base
   has_many :positions
 
   def api
-    # TODO Require and instantiate proper streamer
-
-    @api ||= TradingApi::Simulation.new(self, account_data)
+    # TODO Make this variable.
+    case 'simulation' #mode
+      when 'simulation'
+        require './lib/trading_api/simulation'
+        @api ||= TradingApi::Simulation.new(self, account_data)
+      when 'live'
+        require './lib/trading_api/tradeking'
+        @api ||= TradingApi::Tradeking.new(self, account_data)
+    end
   end
 
   def data_streamer
-    @data_streamer ||= DataStreamer::Generated.new
+    # TODO Make this variable.
+    case 'generated' #streamer
+      when 'generated'
+        require './lib/data_streamer/generated'
+        @data_streamer ||= DataStreamer::Generated.new(self)
+      when 'playback'
+        require './lib/data_streamer/playback'
+        @data_streamer ||= DataStreamer::Playback.new(self)
+      when 'tradeking'
+        require './lib/data_streamer/tradeking'
+        @data_streamer ||= DataStreamer::Tradeking.new(self, account_data)
+    end
   end
   
   def open_position(symbol, investment, price)

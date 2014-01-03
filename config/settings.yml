@@ -1,10 +1,2 @@
 simulation:
-  playback:
-    url: http://localhost:4001
-    port: 4001
-
-  generated:
-    url: http://localhost:4002
-    port: 4002
-
   account_token: 02a802ea14021c90749ca3e57e77d854
