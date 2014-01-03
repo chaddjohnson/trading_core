@@ -6,7 +6,7 @@ module DataStreamer
       quotes = @account.api.quotes(symbols)
 
       EventMachine.run do
-        EventMachine.add_periodic_timer(0.01) do
+        EventMachine.add_periodic_timer(0.02) do
           quotes.each do |quote|
             change_factor = 1
             
