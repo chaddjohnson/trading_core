@@ -7,11 +7,5 @@ module DataStreamer
     def date
       # TODO
     end
-
-    private
-
-    def connect(*args)
-      EventMachine::HttpRequest.new(API_CONFIG['simulation']['playback']['port'])
-    end
   end
 end

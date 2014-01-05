@@ -12,17 +12,11 @@ module DataStreamer
       raise NotImplementedError
     end
 
-    def add_security(security)
+    def add_securities(securities)
       securities = [security].flatten
 
       # TODO
       # ...
-    end
-
-    private
-
-    def connect(*args)
-      raise NotImplementedError
     end
   end
 end

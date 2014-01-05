@@ -1,8 +1,11 @@
+require './lib/data_streamer/base'
+
 module DataStreamer
   class Tradeking < Base
     def initialize(account, credentials)
       super(account)
       @credentials = credentials
+      @api = account.api
     end
 
     def stream_quotes(symbols, callback)
@@ -13,7 +16,7 @@ module DataStreamer
       previous_data = ''
       symbol_data = {}
       
-      quotes(symbols).each do |quote|
+      @api.quotes(symbols).each do |quote|
         symbol_data[quote['symbol']] = quote
       end
 
@@ -23,7 +26,7 @@ module DataStreamer
       #   3) the last error happened more than one minute ago.
       #while !last_connection_error_time || error_count <= 10 || Time.now - last_connection_error_time > 60
         EventMachine.run do
-          http = stream_connection(symbols).get
+          http = stream(symbols).get
           http.stream do |data|
             json_data = nil
             data = data.gsub("\n", '')
@@ -105,8 +108,7 @@ module DataStreamer
 
     private
 
-    def connect(*args)
-      symbols = args[0]
+    def stream(symbols)
       conn = EventMachine::HttpRequest.new("https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}")
       conn.use EventMachine::Middleware::OAuth, @credentials
       conn
