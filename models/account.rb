@@ -1,4 +1,5 @@
 require './lib/trading_api/simulation'
+require 'date'
 
 class Account < ActiveRecord::Base
   attr_accessible :balance
@@ -15,7 +16,7 @@ class Account < ActiveRecord::Base
           TradingApi::Simulation.new(self, account_data)
         when 'tradeking'
           require './lib/trading_api/tradeking'
-          TradingApi::Tradeking.new(self, account_data)
+          TradingApi::Tradeking.new(account_data)
       end
     end
   end
@@ -29,10 +30,13 @@ class Account < ActiveRecord::Base
           DataStreamer::Generated.new(self)
         when 'playback'
           require './lib/data_streamer/playback'
-          DataStreamer::Playback.new(self)
+          data_streamer = DataStreamer::Playback.new(self)
+          data_streamer.set_date(playback_date || Date.today.to_s)
+          data_streamer.set_playback_rate(10)
+          data_streamer
         when 'tradeking'
           require './lib/data_streamer/tradeking'
-          DataStreamer::Tradeking.new(self, account_data)
+          DataStreamer::Tradeking.new(self)
       end
     end
   end

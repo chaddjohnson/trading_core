@@ -2,12 +2,6 @@ require './lib/data_streamer/base'
 
 module DataStreamer
   class Tradeking < Base
-    def initialize(account, credentials)
-      super(account)
-      @credentials = credentials
-      @api = account.api
-    end
-
     def stream_quotes(symbols, callback)
       symbols = [symbols].flatten
       last_connection_error_time = nil
@@ -16,7 +10,7 @@ module DataStreamer
       previous_data = ''
       symbol_data = {}
       
-      @api.quotes(symbols).each do |quote|
+      @account.api.quotes(symbols).each do |quote|
         symbol_data[quote['symbol']] = quote
       end
 
@@ -110,7 +104,7 @@ module DataStreamer
 
     def stream(symbols)
       conn = EventMachine::HttpRequest.new("https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}")
-      conn.use EventMachine::Middleware::OAuth, @credentials
+      conn.use EventMachine::Middleware::OAuth, @account.account_data
       conn
     end
   end
