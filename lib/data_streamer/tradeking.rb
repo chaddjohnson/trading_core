@@ -77,7 +77,6 @@ module DataStreamer
               callback.call(symbol_data[symbol])
               error_count = 0
             rescue => error
-              puts "ERROR: #{error.message}"
               previous_data = data
             end
           end
