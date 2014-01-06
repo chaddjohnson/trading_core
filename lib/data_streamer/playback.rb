@@ -42,7 +42,7 @@ module DataStreamer
             :bid_price      => quote.bid_price.to_f,
             :change         => change,
             :change_percent => change_percent,
-            :volume         => quote.trade_volume
+            :volume         => quote.cumulative_volume
           })
 
           # Call the callback with the current quote's data.
