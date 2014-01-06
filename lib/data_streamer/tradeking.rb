@@ -102,7 +102,7 @@ module DataStreamer
     private
 
     def stream(symbols)
-      conn = EventMachine::HttpRequest.new("https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}")
+      conn = EventMachine::HttpRequest.new("https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}", :inactivity_timeout => 0)
       conn.use EventMachine::Middleware::OAuth, @account.account_data
       conn
     end
