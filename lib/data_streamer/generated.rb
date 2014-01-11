@@ -16,11 +16,14 @@ module DataStreamer
               else
                 change_factor = 0.99975
               end
+
+              trade_volume = Random.rand(100..2000)
     
               quote['ask_price'] = (quote['ask_price'] * change_factor).round(2)
               quote['bid_price'] = (quote['ask_price'] * change_factor).round(2)
               quote['last_price'] = (((quote['ask_price'] - quote['bid_price']) / 2) + quote['bid_price']).round(2)
-              quote['volume'] += 100
+              quote['trade_volume'] = trade_volume
+              quote['cumulative_volume'] += trade_volume
               quote['timestamp'] = Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
 
               callback.call(quote)

@@ -41,7 +41,10 @@ module DataStreamer
           index += 1
           next_quote = quotes[index]
 
-          EventMachine.stop if !quote
+          if !quote
+            EventMachine.stop
+            return
+          end
 
           previous_close_prices[quote.security.symbol] = quote.last_price.to_f if !previous_close_prices[quote.security.symbol]
 
@@ -50,15 +53,16 @@ module DataStreamer
           change_percent = change_percent == 0 ? 0.0 : change_percent
 
           callback.call({
-            :symbol         => quote.security.symbol,
-            :last_price     => quote.last_price.to_f,
-            :ask_price      => quote.ask_price.to_f,
-            :bid_price      => quote.bid_price.to_f,
-            :change         => change,
-            :change_percent => change_percent,
-            :average_volume => quote.average_volume,
-            :volume         => quote.cumulative_volume,
-            :timestamp      => quote.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            :symbol            => quote.security.symbol,
+            :last_price        => quote.last_price.to_f,
+            :ask_price         => quote.ask_price.to_f,
+            :bid_price         => quote.bid_price.to_f,
+            :change            => change,
+            :change_percent    => change_percent,
+            :trade_volume      => quote.trade_volume,
+            :cumulative_volume => quote.cumulative_volume,
+            :average_volume    => quote.average_volume,
+            :timestamp         => quote.created_at.strftime('%Y-%m-%d %H:%M:%S')
           })
 
           if next_quote

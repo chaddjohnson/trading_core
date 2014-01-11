@@ -67,11 +67,12 @@ module DataStreamer
                 change_percent = (((trade['last'].to_f / symbol_data[symbol]['previous_close'].to_f) - 1) * 100).round(2)
                 change_percent = change_percent == 0 ? 0.0 : change_percent
                 symbol_data[trade['symbol']].merge!({
-                  :last_price     => trade['last'].to_f,
-                  :change         => change,
-                  :change_percent => change_percent,
-                  :volume         => trade['cvol'].to_i,
-                  :timestamp      => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
+                  :last_price        => trade['last'].to_f,
+                  :change            => change,
+                  :change_percent    => change_percent,
+                  :trade_volume      => trade['cvol'].to_i,
+                  :cumulative_volume => symbol_data[symbol]['cumulative_volume'] + trade['cvol'].to_i,
+                  :timestamp         => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
                 })
               end
               

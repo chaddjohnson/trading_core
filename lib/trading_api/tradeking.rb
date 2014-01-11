@@ -28,16 +28,16 @@ module TradingApi
       document.xpath('//quotes/quote').each do |quote|
         change_sign = quote.xpath('chg_sign').text == 'd' ? '-' : ''
         quotes << {
-          'symbol'         => quote.xpath('symbol').text,
-          'last_price'     => quote.xpath('last').text.to_f,
-          'ask_price'      => quote.xpath('ask').text.to_f,
-          'bid_price'      => quote.xpath('bid').text.to_f,
-          'previous_close' => quote.xpath('pcls').text.to_f,
-          'change'         => (change_sign + quote.xpath('chg').text).to_f,
-          'change_percent' => (change_sign + quote.xpath('pchg').text).gsub(' %', '').to_f,
-          'average_volume' => quote.xpath('adv_90').text.to_i,
-          'volume'         => quote.xpath('vl').text.to_i,
-          'timestamp'      => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
+          'symbol'            => quote.xpath('symbol').text,
+          'last_price'        => quote.xpath('last').text.to_f,
+          'ask_price'         => quote.xpath('ask').text.to_f,
+          'bid_price'         => quote.xpath('bid').text.to_f,
+          'previous_close'    => quote.xpath('pcls').text.to_f,
+          'change'            => (change_sign + quote.xpath('chg').text).to_f,
+          'change_percent'    => (change_sign + quote.xpath('pchg').text).gsub(' %', '').to_f,
+          'average_volume'    => quote.xpath('adv_90').text.to_i,
+          'cumulative_volume' => quote.xpath('vl').text.to_i,
+          'timestamp'         => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
         }
       end
       
