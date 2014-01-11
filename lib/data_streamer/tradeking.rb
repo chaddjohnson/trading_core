@@ -1,4 +1,5 @@
 require './lib/data_streamer/base'
+require 'date'
 
 module DataStreamer
   class Tradeking < Base
@@ -29,6 +30,7 @@ module DataStreamer
               begin
                 json_data = JSON.parse(previous_data + data)
               rescue => error
+                # TODO Maybe put a "next" here?
               end
             end
             previous_data = ''
@@ -68,7 +70,8 @@ module DataStreamer
                   :last_price     => trade['last'].to_f,
                   :change         => change,
                   :change_percent => change_percent,
-                  :volume         => trade['cvol'].to_i
+                  :volume         => trade['cvol'].to_i,
+                  :timestamp      => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
                 })
               end
               
@@ -102,7 +105,8 @@ module DataStreamer
     private
 
     def stream(symbols)
-      conn = EventMachine::HttpRequest.new("https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}", :inactivity_timeout => 0)
+      url = "https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}"
+      conn = EventMachine::HttpRequest.new(url, :connect_timeout => 0, :inactivity_timeout => 0)
       conn.use EventMachine::Middleware::OAuth, @account.account_data
       conn
     end

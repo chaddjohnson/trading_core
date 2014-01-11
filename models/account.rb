@@ -32,7 +32,7 @@ class Account < ActiveRecord::Base
           require './lib/data_streamer/playback'
           data_streamer = DataStreamer::Playback.new(self)
           data_streamer.set_date(playback_date || Date.today.to_s)
-          data_streamer.set_playback_rate(2)
+          data_streamer.set_playback_rate(200)
           data_streamer
         when 'tradeking'
           require './lib/data_streamer/tradeking'

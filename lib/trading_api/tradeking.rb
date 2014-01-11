@@ -36,7 +36,8 @@ module TradingApi
           'change'         => (change_sign + quote.xpath('chg').text).to_f,
           'change_percent' => (change_sign + quote.xpath('pchg').text).gsub(' %', '').to_f,
           'average_volume' => quote.xpath('adv_90').text.to_i,
-          'volume'         => quote.xpath('vl').text.to_i
+          'volume'         => quote.xpath('vl').text.to_i,
+          'timestamp'      => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
         }
       end
       

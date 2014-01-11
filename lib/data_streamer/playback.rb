@@ -5,6 +5,8 @@ module DataStreamer
     def initialize(account)
       super(account)
       set_playback_rate(1)
+
+      @symbols = []
     end
 
     def set_date(date)
@@ -16,44 +18,54 @@ module DataStreamer
     end
 
     def stream_quotes(symbols, callback)
-      quotes = Quote.by_date(@date).by_symbols(symbols).order(:created_at)
-      symbol_data = {}
+      # Ignore requests for symbols already being streamed.
+      @symbols.each do |symbol|
+        symbols.delete(symbol) if @symbols.include?(symbol)
+      end
+      return if symbols.length == 0
+
+      # Add symbols to list of symbols being streamed.
+      @symbols.concat(symbols)
+
+      quotes = Quote.by_date(@date).by_symbols(@symbols).order(:created_at)
+      previous_close_prices = {}
       index = 0
 
-      @account.api.quotes(symbols).each do |quote|
-        symbol_data[quote['symbol']] = quote
-
-        previous_close_quote = Quote.by_date(@date).by_symbols([quote['symbol']]).order(:created_at).last || quotes.first
-        symbol_data[quote['symbol']]['previous_close'] = previous_close_quote.last_price
+      @symbols.each do |symbol|
+        previous_close_prices[symbol] = Quote.previous_close(symbol, @date)
       end
 
       EventMachine.run do
         EventMachine.add_periodic_timer(0.001) do
           quote = quotes[index]
+          index += 1
+          next_quote = quotes[index]
+
           EventMachine.stop if !quote
 
-          change = (quote.last_price.to_f - symbol_data[quote.security.symbol]['previous_close'].to_f).round(2)
-          change_percent = (((quote.last_price.to_f / symbol_data[quote.security.symbol]['previous_close'].to_f) - 1) * 100).round(2)
+          previous_close_prices[quote.security.symbol] = quote.last_price.to_f if !previous_close_prices[quote.security.symbol]
+
+          change = (quote.last_price.to_f - previous_close_prices[quote.security.symbol]).round(2)
+          change_percent = (((quote.last_price.to_f / previous_close_prices[quote.security.symbol]) - 1) * 100).round(2)
           change_percent = change_percent == 0 ? 0.0 : change_percent
 
-          symbol_data[quote.security.symbol].merge!({
+          callback.call({
+            :symbol         => quote.security.symbol,
             :last_price     => quote.last_price.to_f,
             :ask_price      => quote.ask_price.to_f,
             :bid_price      => quote.bid_price.to_f,
             :change         => change,
             :change_percent => change_percent,
-            :volume         => quote.cumulative_volume
+            :average_volume => quote.average_volume,
+            :volume         => quote.cumulative_volume,
+            :timestamp      => quote.created_at.strftime('%Y-%m-%d %H:%M:%S')
           })
 
-          # Call the callback with the current quote's data.
-          callback.call(symbol_data[quote.security.symbol])
-
-          # Wait the number of seconds between this quote and the next quote
-          next_quote = quotes[index+1]
-          delay = (next_quote.created_at.to_i - quote.created_at.to_i) * @playback_rate
-          sleep(delay) if next_quote
-
-          index += 1
+          if next_quote
+            # Wait the number of seconds between this quote and the next quote
+            delay = (next_quote.created_at.to_i - quote.created_at.to_i) * @playback_rate
+            sleep(delay)
+          end
         end
       end
     end
