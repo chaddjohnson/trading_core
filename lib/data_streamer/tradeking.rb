@@ -68,6 +68,7 @@ module DataStreamer
                 change_percent = change_percent == 0 ? 0.0 : change_percent
                 symbol_data[trade['symbol']].merge!({
                   :last_price        => trade['last'].to_f,
+                  :previous_close    => symbol_data[symbol]['previous_close'].to_f,
                   :change            => change,
                   :change_percent    => change_percent,
                   :trade_volume      => trade['cvol'].to_i,

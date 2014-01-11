@@ -81,7 +81,7 @@ class WebSocketService
           }
           @socket.send(response_data.to_json)
           
-          # Record history.
+          # Record history (only in live mode)
           # ...
         end
         @streamer.stream_quotes(message_data['symbols'], quote_callback)

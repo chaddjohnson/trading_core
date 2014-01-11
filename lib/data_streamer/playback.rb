@@ -57,6 +57,7 @@ module DataStreamer
             :last_price        => quote.last_price.to_f,
             :ask_price         => quote.ask_price.to_f,
             :bid_price         => quote.bid_price.to_f,
+            :previous_close    => previous_close_prices[quote.security.symbol],
             :change            => change,
             :change_percent    => change_percent,
             :trade_volume      => quote.trade_volume,
