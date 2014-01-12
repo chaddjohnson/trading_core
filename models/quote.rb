@@ -12,11 +12,11 @@ class Quote < ActiveRecord::Base
   end
 
   def self.previous_close(symbol, date)
-    quote =  where('date < ?', date) \
-            .where("TIME(`timestamp`) BETWEEN '14:30:00' AND '21:00:00'") \
-            .by_symbols(symbol) \
-            .order(:created_at) \
-            .last
+    quote = where('date < ?', date) \
+           .where("TIME(`timestamp`) BETWEEN '14:30:00' AND '21:00:00'") \
+           .by_symbols(symbol) \
+           .order(:created_at) \
+           .last
     
     quote.last_price.to_f if quote
     nil
