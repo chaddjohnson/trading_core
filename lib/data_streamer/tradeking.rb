@@ -72,13 +72,16 @@ module DataStreamer
                   :change            => change,
                   :change_percent    => change_percent,
                   :trade_volume      => trade['cvol'].to_i,
-                  :cumulative_volume => symbol_data[symbol]['cumulative_volume'] + trade['cvol'].to_i,
-                  :timestamp         => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
+                  :cumulative_volume => symbol_data[symbol]['cumulative_volume'] + trade['cvol'].to_i
                 })
               end
               
               next if !symbol
               
+              symbol_data[trade['symbol']].merge!({
+                :timestamp => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
+              })
+
               callback.call(symbol_data[symbol])
               error_count = 0
             rescue => error
