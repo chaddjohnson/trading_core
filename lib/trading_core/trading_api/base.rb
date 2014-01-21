@@ -21,7 +21,8 @@ module TradingApi
       :buy             => 12,
       :sell            => 13,
       :history         => 14,
-      :history_add     => 15
+      :history_add     => 15,
+      :chart_data      => 16
     }
   end
   

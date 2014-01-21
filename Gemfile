@@ -1,13 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'activerecord'
-gem 'protected_attributes'
-gem 'mysql2'
-gem 'em-websocket', :git => 'git://github.com/igrigorik/em-websocket.git'
-gem 'rack-stream'
-gem 'em-http-request'
-gem 'eventmachine'
-gem 'nokogiri'
-gem 'oauth'
-gem 'simple_oauth'
-gem 'thin'
+# Specify your gem's dependencies in trading_core.gemspec
+gemspec

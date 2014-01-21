@@ -2,7 +2,18 @@ require './lib/data_streamer/base'
 
 module DataStreamer
   class Generated < Base
+    def initialize(account)
+      super(account)
+      @streaming = false
+      @symbols = []
+    end
+
     def stream_quotes(symbols, callback)
+      symbols = [symbols].flatten
+
+      return if @streaming
+      @streaming = true
+
       quotes = @account.api.quotes(symbols)
 
       EventMachine.run do
@@ -35,8 +46,8 @@ module DataStreamer
       end
     end
 
-    def date
-      # TODO
+    def stop
+      EventMachine.stop_event_loop
     end
   end
 end

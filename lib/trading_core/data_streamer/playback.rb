@@ -6,6 +6,7 @@ module DataStreamer
       super(account)
       set_playback_rate(1)
 
+      @streaming = false
       @symbols = []
     end
 
@@ -18,14 +19,10 @@ module DataStreamer
     end
 
     def stream_quotes(symbols, callback)
-      # Ignore requests for symbols already being streamed.
-      @symbols.each do |symbol|
-        symbols.delete(symbol) if @symbols.include?(symbol)
-      end
-      return if symbols.length == 0
+      symbols = [symbols].flatten
 
-      # Add symbols to list of symbols being streamed.
-      @symbols.concat(symbols)
+      return if @streaming
+      @streaming = true
 
       quotes = Quote.by_date(@date).by_symbols(@symbols).order(:created_at)
       previous_close_prices = {}
@@ -75,8 +72,8 @@ module DataStreamer
       end
     end
 
-    def date
-      # TODO
+    def stop
+      EventMachine.stop_event_loop
     end
   end
 end
