@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = TradingCore::VERSION
   spec.authors       = ["Chad Johnson"]
   spec.email         = ["chad.d.johnson@gmail.com"]
-  spec.description   = %q{TODO: Write a gem description}
-  spec.summary       = %q{TODO: Write a gem summary}
+  spec.description   = %q{Core libraries for trading projects}
+  spec.summary       = %q{Core libraries for trading projects}
   spec.homepage      = ""
   spec.license       = "MIT"
 
@@ -27,6 +27,7 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'em-websocket'
   spec.add_runtime_dependency 'eventmachine'
   spec.add_runtime_dependency 'nokogiri'
+  spec.add_runtime_dependency 'oauth'
   spec.add_runtime_dependency 'simple_oauth'
   spec.add_runtime_dependency 'em-http-request'
   spec.add_runtime_dependency 'em-websocket'

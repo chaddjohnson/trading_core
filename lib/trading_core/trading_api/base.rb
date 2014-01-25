@@ -2,7 +2,7 @@ require 'observer'
 require 'oauth'
 require 'em-http'
 require 'em-http/middleware/oauth'
-require './lib/trading_api/error'
+require 'trading_core/trading_api/error'
 
 module TradingApi
   def self.types

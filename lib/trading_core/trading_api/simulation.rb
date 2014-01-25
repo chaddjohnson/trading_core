@@ -1,4 +1,4 @@
-require './lib/trading_api/tradeking'
+require 'trading_core/trading_api/tradeking'
 
 module TradingApi
   class Simulation < Tradeking
@@ -12,7 +12,7 @@ module TradingApi
       return super(symbols) if self.time.to_s == Time.now.getutc.to_s
       
       # A time was specified, so return a historical quote
-      #SecurityHistory.
+      #Quote.
     end
     
     def account_info
@@ -25,7 +25,7 @@ module TradingApi
     
     def positions
       data = []
-      # Position.current.each do |position|
+      # TradingCore::Position.current.each do |position|
         # data << {
           # :symbol       => position.security.symbol,
           # :cost_basis   => position.cost_basis

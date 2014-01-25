@@ -1,7 +1,7 @@
-require './lib/data_streamer/base'
+require 'trading_core/quote_streamer/base'
 require 'date'
 
-module DataStreamer
+module QuoteStreamer
   class Tradeking < Base
     def initialize(account)
       super(account)
@@ -19,6 +19,7 @@ module DataStreamer
       @streaming = true
 
       symbols = [symbols].flatten
+      @symbols.concat(symbols).uniq!
 
       previous_data = ''
       symbol_data = {}
@@ -59,8 +60,8 @@ module DataStreamer
             
             symbol = quote['symbol']
             symbol_data[quote['symbol']].merge!({
-              :ask_price => quote['ask'].to_f,
-              :bid_price => quote['bid'].to_f
+              'ask_price' => quote['ask'].to_f,
+              'bid_price' => quote['bid'].to_f
             })
           end
           
@@ -73,19 +74,19 @@ module DataStreamer
             change_percent = (((trade['last'].to_f / symbol_data[symbol]['previous_close'].to_f) - 1) * 100).round(2)
             change_percent = change_percent == 0 ? 0.0 : change_percent
             symbol_data[trade['symbol']].merge!({
-              :last_price        => trade['last'].to_f,
-              :previous_close    => symbol_data[symbol]['previous_close'].to_f,
-              :change            => change,
-              :change_percent    => change_percent,
-              :trade_volume      => trade['cvol'].to_i,
-              :cumulative_volume => symbol_data[symbol]['cumulative_volume'] + trade['cvol'].to_i
+              'last_price'        => trade['last'].to_f,
+              'previous_close'    => symbol_data[symbol]['previous_close'].to_f,
+              'change'            => change,
+              'change_percent'    => change_percent,
+              'trade_volume'      => trade['cvol'].to_i,
+              'cumulative_volume' => symbol_data[symbol]['cumulative_volume'] + trade['cvol'].to_i
             })
           end
           
           next if !symbol
           
           symbol_data[trade['symbol']].merge!({
-            :timestamp => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
+            'timestamp' => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
           })
 
           callback.call(symbol_data[symbol])
@@ -117,6 +118,10 @@ module DataStreamer
     def stop
       @streaming = false
       @http.close
+    end
+
+    def live?
+      true
     end
 
     private

@@ -1,4 +1,4 @@
-module DataStreamer
+module QuoteStreamer
   class Base
     def initialize(account)
       @account = account
@@ -21,6 +21,10 @@ module DataStreamer
 
       # TODO
       # ...
+    end
+
+    def live?
+      railse NotImplementedError
     end
   end
 end
