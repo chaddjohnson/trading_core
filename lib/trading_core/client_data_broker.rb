@@ -14,31 +14,43 @@ module TradingCore
     end
 
     def start
+      previous_last_prices = {}
+
       callback = lambda do |data|
-        return if !@clients[data['symbol']]
+        symbol = data['symbol']
+
+        # Skip this iteration if there are no clients for the symbol.
+        return if !@clients[symbol]
+
+        # Skip major spike quotes.
+        previous_last_prices[symbol] ||= data['last_price'].to_f
+        next if data['last_price'].to_f / previous_last_prices[symbol] > 1.015
+        next if data['last_price'].to_f / previous_last_prices[symbol] < 0.985
 
         # Build the response and send it to each client subscribed to the symbol.
         response_data = {
           :type => TradingApi.types[:stream_quotes],
           :data => data
         }.to_json
-        @clients[data['symbol']].each do |client|
+        @clients[symbol].each do |client|
           client.send(response_data)
         end
 
         # Record history (only in live mode).
         Quote.create({
-          :security_id       => @securities[data['symbol']].id,
+          :security_id       => @securities[symbol].id,
           :last_price        => data['last_price'].to_f,
           :bid_price         => data['previous_close'].to_f,
           :ask_price         => data['change'].to_f,
-          :date              => data['change_percent'],
-          :timestamp         => data['trade_volume'],
+          :date              => data['change_percent'].to_f,
+          :timestamp         => data['trade_volume'].to_i,
           :trade_volume      => data['cumulative_volume'].to_i,
           :cumulative_volume => data['change_percent'].to_i,
           :average_volume    => data['change_percent'].to_i,
           :created_at        => data['change_percent'],
         }) if @quote_streamer.live?
+
+        previous_last_prices[symbol] = data['last_price'].to_f
       end
 
       @quote_streamer.stream_quotes(@securities.values.map(&:symbol), callback)
