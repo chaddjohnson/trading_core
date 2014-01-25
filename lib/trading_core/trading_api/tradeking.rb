@@ -89,7 +89,7 @@ module TradingApi
         
         # Manually update the access token/secret.  Typically this would be done through an OAuth callback when 
         # authenticating other users.
-        OAuth::AccessToken.new(consumer, @credentials[:access_token], @credentials[:access_token_secret])
+        OAuth::AccessToken.new(consumer, @credentials[:oauth_token], @credentials[:oauth_token_secret])
       end
     end
   end
