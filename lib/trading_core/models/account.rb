@@ -34,7 +34,7 @@ module TradingCore
             require 'trading_core/quote_streamer/playback'
             quote_streamer = QuoteStreamer::Playback.new(self)
             quote_streamer.set_date(playback_date || Date.today.to_s)
-            quote_streamer.set_playback_rate(100)
+            quote_streamer.set_playback_rate(25)
             quote_streamer
           when 'tradeking'
             require 'trading_core/quote_streamer/tradeking'

@@ -10,7 +10,7 @@ module TradingApi
       :login           => 1,
       :account_info    => 2,
       :account_update  => 3,
-      :quotes          => 4,
+      :quote           => 4,
       :stream_quotes   => 5,
       :positions       => 6,
       :position_add    => 7,
