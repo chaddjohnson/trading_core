@@ -47,6 +47,7 @@ module QuoteStreamer
 
     def stop
       # TODO
+      @streaming = false
     end
 
     def live?

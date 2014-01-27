@@ -101,6 +101,7 @@ module QuoteStreamer
       end
 
       @http.errback do
+        @streaming = false
         @http.close
         puts "HTTP ERROR: #{@http.error}"
 
@@ -113,7 +114,6 @@ module QuoteStreamer
         #   2) there are ten or less consecutive errors; or
         #   3) the last error happened more than one minute ago.
         if !@last_connection_error_time || @error_count <= 5 || Time.now.to_i - @last_connection_error_time.to_i > 60
-          sleep 1
           puts 'Reconnecting to Tradeking...'
           stream_quotes(@symbols, callback)
         end
