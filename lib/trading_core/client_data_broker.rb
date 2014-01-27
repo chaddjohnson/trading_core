@@ -19,9 +19,6 @@ module TradingCore
       callback = lambda do |data|
         symbol = data['symbol']
 
-        # Skip this iteration if there are no clients for the symbol.
-        return if !@clients[symbol]
-
         # Skip major spike quotes.
         previous_last_prices[symbol] ||= data['last_price'].to_f
         next if data['last_price'].to_f / previous_last_prices[symbol] > 1.015
