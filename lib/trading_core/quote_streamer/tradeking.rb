@@ -71,6 +71,7 @@ module QuoteStreamer
           # Update trade data.
           if trade
             next if !symbol_data[trade['symbol']]
+            next if trade['last'].to_f == 0.0
 
             symbol = trade['symbol']
             change = (trade['last'].to_f - symbol_data[symbol]['previous_close'].to_f).round(2)
