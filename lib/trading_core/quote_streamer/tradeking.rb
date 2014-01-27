@@ -12,6 +12,7 @@ module QuoteStreamer
       @last_connection_error_time = nil
       @connection_error_time = nil
       @error_count = 0
+      @reconnect_attempt_count = 0
     end
 
     def stream_quotes(symbols, callback)
@@ -114,6 +115,7 @@ module QuoteStreamer
         #   2) there are ten or less consecutive errors; or
         #   3) the last error happened more than one minute ago.
         if !@last_connection_error_time || @error_count <= 5 || Time.now.to_i - @last_connection_error_time.to_i > 60
+          sleep 1
           puts 'Reconnecting to Tradeking...'
           stream_quotes(@symbols, callback)
         end
@@ -132,11 +134,18 @@ module QuoteStreamer
     private
 
     def stream(symbols)
-      url = "https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}"
-      conn = EventMachine::HttpRequest.new(url, :connect_timeout => 0, :inactivity_timeout => 0)
-      conn.use EventMachine::Middleware::OAuth, @account.account_data
-      puts 'Connected to Tradeking'
-      conn
+      begin
+        url = "https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}"
+        conn = EventMachine::HttpRequest.new(url, :connect_timeout => 0, :inactivity_timeout => 0)
+        conn.use EventMachine::Middleware::OAuth, @account.account_data
+        puts 'Connected to Tradeking'
+        @reconnect_attempt_count = 0
+      rescue => error
+        @reconnect_attempt_count += 1
+        stream(symbols) if @reconnect_attempt_count <= 5
+      end
+
+      return conn
     end
   end
 end
