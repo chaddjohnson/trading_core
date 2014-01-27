@@ -140,9 +140,11 @@ module QuoteStreamer
         conn.use EventMachine::Middleware::OAuth, @account.account_data
         puts 'Connected to Tradeking'
         @reconnect_attempt_count = 0
+
+        return conn
       rescue => error
         @reconnect_attempt_count += 1
-        stream(symbols) if @reconnect_attempt_count <= 5
+        return stream(symbols) if @reconnect_attempt_count <= 5
       end
 
       return conn
