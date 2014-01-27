@@ -14,7 +14,7 @@ module TradingApi
     end
     
     def positions
-      puts api.get("/v1/accounts/#{@credentials[:account_id]}/holdings.xml").body
+      puts api_request("/v1/accounts/#{@credentials[:account_id]}/holdings.xml").body
     end
     
     def orders
@@ -22,7 +22,7 @@ module TradingApi
     
     def quotes(symbols)
       symbols = [symbols].flatten
-      quote_xml = api.get("/v1/market/ext/quotes.xml?symbols=#{symbols.join(',')}&fids=ask,bid,pcls,last,adv_90,vl,chg,pchg,chg_sign").body
+      quote_xml = api_request("/v1/market/ext/quotes.xml?symbols=#{symbols.join(',')}&fids=ask,bid,pcls,last,adv_90,vl,chg,pchg,chg_sign").body
       document = Nokogiri::XML(quote_xml)
       quotes = []
       document.xpath('//quotes/quote').each do |quote|
@@ -45,7 +45,7 @@ module TradingApi
     end
 
     def news(symbol)
-      news_xml = api.get("/v1/market/news/search.xml?symbols=#{symbol}").body
+      news_xml = api_request("/v1/market/news/search.xml?symbols=#{symbol}").body
       articles = []
       document = Nokogiri::XML(news_xml)
       document.xpath('//articles/article').each do |article|
@@ -60,7 +60,7 @@ module TradingApi
     end
     
     def news_item(id)
-      news_xml = api.get("/v1/market/news/#{id}.xml").body
+      news_xml = api_request("/v1/market/news/#{id}.xml").body
       articles = []
       document = Nokogiri::XML(news_xml)
       article = document.xpath('//article')
@@ -91,6 +91,18 @@ module TradingApi
         # authenticating other users.
         OAuth::AccessToken.new(consumer, @credentials[:access_token], @credentials[:access_token_secret])
       end
+    end
+
+    def api_request(url, attempts = 0)
+      begin
+        attempts += 1
+        return api.get(url)
+      rescue => error
+        sleep 0.5
+        api_request(url, attempts) if attempts <= 10
+      end
+
+      return api.get(url)
     end
   end
 end

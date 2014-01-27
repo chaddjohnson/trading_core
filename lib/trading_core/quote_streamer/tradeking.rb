@@ -143,8 +143,8 @@ module QuoteStreamer
 
         return conn
       rescue => error
+        sleep 1
         @reconnect_attempt_count += 1
-        sleep @reconnect_attempt_count
         puts "Attempting reconnect..."
         return stream(symbols) if @reconnect_attempt_count <= 10
       end
