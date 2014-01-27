@@ -99,7 +99,7 @@ module TradingApi
         return api.get(url)
       rescue => error
         sleep 0.5
-        api_request(url, attempts) if attempts <= 10
+        return api_request(url, attempts) if attempts <= 10
       end
 
       return api.get(url)
