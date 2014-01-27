@@ -31,20 +31,19 @@ module TradingCore
         }.to_json
         @clients[symbol].each do |client|
           client.send(response_data)
-        end
+        end if @clients[symbol]
 
         # Record history (only in live mode).
         Quote.create({
           :security_id       => @securities[symbol].id,
           :last_price        => data['last_price'].to_f,
-          :bid_price         => data['previous_close'].to_f,
-          :ask_price         => data['change'].to_f,
-          :date              => data['change_percent'].to_f,
-          :timestamp         => data['trade_volume'].to_i,
-          :trade_volume      => data['cumulative_volume'].to_i,
-          :cumulative_volume => data['change_percent'].to_i,
-          :average_volume    => data['change_percent'].to_i,
-          :created_at        => data['change_percent'],
+          :bid_price         => data['bid_price'].to_f,
+          :ask_price         => data['ask_price'].to_f,
+          :date              => Date.today,
+          :timestamp         => Time.now.getutc,
+          :trade_volume      => data['trade_volume'].to_i,
+          :cumulative_volume => data['cumulative_volume'].to_i,
+          :average_volume    => data['average_volume'].to_i,
         }) if @quote_streamer.live?
 
         previous_last_prices[symbol] = data['last_price'].to_f

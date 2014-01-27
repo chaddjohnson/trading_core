@@ -22,5 +22,15 @@ module TradingCore
       quote.last_price.to_f if quote
       nil
     end
+
+    def self.chart_data(security, date)
+      quotes = Quote.connection.select_all("CALL chart_quotes(#{security.id})")
+      ActiveRecord::Base.connection.reconnect!
+      results = []
+      quotes.each do |quote|
+        results << Quote.new(quote)
+      end
+      return results
+    end
   end
 end
