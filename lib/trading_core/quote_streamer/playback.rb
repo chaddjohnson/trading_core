@@ -18,7 +18,7 @@ module QuoteStreamer
       @playback_rate = 1.0 / rate
     end
 
-    def stream_quotes(symbols, callback, attempts = 0)
+    def stream_quotes(symbols, callback)
       return if @streaming
       @streaming = true
 

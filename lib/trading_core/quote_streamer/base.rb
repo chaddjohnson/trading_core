@@ -4,7 +4,7 @@ module QuoteStreamer
       @account = account
     end
 
-    def stream_quotes(symbols, callback, attempts = 0)
+    def stream_quotes(symbols, callback)
       raise NotImplementedError
     end
 

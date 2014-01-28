@@ -10,7 +10,7 @@ module QuoteStreamer
       @symbols = []
     end
 
-    def stream_quotes(symbols, callback, attempts = 0)
+    def stream_quotes(symbols, callback)
       return if @streaming
       @streaming = true
 
@@ -26,8 +26,6 @@ module QuoteStreamer
 
       @http = stream(symbols).get
       @http.stream do |data|
-        attempts = 0
-
         json_data = nil
         data = data.gsub("\n", '')
         
@@ -102,17 +100,9 @@ module QuoteStreamer
         @http.close
         puts "HTTP ERROR: #{@http.error}"
 
-        attempts += 1
-
-        # Reconnect if
-        #   1) there has never been an error; or
-        #   2) there are ten or less consecutive errors; or
-        #   3) the last error happened more than one minute ago.
-        if attempts <= 10
-          sleep 1
-          puts 'Reconnecting to Tradeking...'
-          stream_quotes(@symbols, callback, attempts)
-        end
+        sleep 1
+        puts 'Reconnecting to Tradeking...'
+        stream_quotes(@symbols, callback)
       end
     end
 
