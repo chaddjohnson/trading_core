@@ -11,9 +11,30 @@ module TradingCore
       symbols.each do |symbol|
         @securities[symbol] = TradingCore::Security.where(:symbol => symbol).first
       end
+
+      stream
     end
 
-    def start
+    def add_client(client, symbol)
+      @securities[symbol] = TradingCore::Security.where(:symbol => symbol).first if !@securities[symbol]
+
+      @clients[symbol] ||= []
+      @clients[symbol] << client
+    end
+
+    def remove_client(client, symbol = nil)
+      @clients.each do |current_symbol, client_list|
+        next if symbol && current_symbol != symbol
+
+        client_list.each do |client|
+          client_list.delete(client) if client.equal? client
+        end
+      end
+    end
+
+    private
+
+    def stream
       previous_last_prices = {}
 
       callback = lambda do |data|
@@ -50,23 +71,6 @@ module TradingCore
       end
 
       @quote_streamer.stream_quotes(@securities.values.map(&:symbol), callback)
-    end
-
-    def add_client(client, symbol)
-      @securities[symbol] = TradingCore::Security.where(:symbol => symbol).first if !@securities[symbol]
-
-      @clients[symbol] ||= []
-      @clients[symbol] << client
-    end
-
-    def remove_client(client, symbol = nil)
-      @clients.each do |current_symbol, client_list|
-        next if symbol && current_symbol != symbol
-
-        client_list.each do |client|
-          client_list.delete(client) if client.equal? client
-        end
-      end
     end
   end
 end
