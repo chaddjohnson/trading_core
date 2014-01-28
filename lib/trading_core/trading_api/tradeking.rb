@@ -96,12 +96,14 @@ module TradingApi
     def api_request(url, attempts = 0)
       begin
         attempts += 1
+        puts 'Making API request...'
         return api.get(url)
       rescue => error
-        sleep 0.5
+        sleep 1
         return api_request(url, attempts) if attempts <= 10
       end
 
+      puts 'Making API request...'
       return api.get(url)
     end
   end

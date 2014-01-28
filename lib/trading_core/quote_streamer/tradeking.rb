@@ -8,14 +8,9 @@ module QuoteStreamer
 
       @streaming = false
       @symbols = []
-
-      @last_connection_error_time = nil
-      @connection_error_time = nil
-      @error_count = 0
-      @reconnect_attempt_count = 0
     end
 
-    def stream_quotes(symbols, callback)
+    def stream_quotes(symbols, callback, attempts = 0)
       return if @streaming
       @streaming = true
 
@@ -31,6 +26,8 @@ module QuoteStreamer
 
       @http = stream(symbols).get
       @http.stream do |data|
+        attempts = 0
+
         json_data = nil
         data = data.gsub("\n", '')
         
@@ -95,7 +92,6 @@ module QuoteStreamer
           }) if !quote
 
           callback.call(symbol_data[symbol])
-          @error_count = 0
         rescue => error
           previous_data = data
         end
@@ -106,18 +102,16 @@ module QuoteStreamer
         @http.close
         puts "HTTP ERROR: #{@http.error}"
 
-        @error_count += 1
-        @last_connection_error_time = @connection_error_time
-        @connection_error_time = Time.now
+        attempts += 1
 
         # Reconnect if
         #   1) there has never been an error; or
         #   2) there are ten or less consecutive errors; or
         #   3) the last error happened more than one minute ago.
-        if !@last_connection_error_time || @error_count <= 5 || Time.now.to_i - @last_connection_error_time.to_i > 60
+        if attempts <= 10
           sleep 1
           puts 'Reconnecting to Tradeking...'
-          stream_quotes(@symbols, callback)
+          stream_quotes(@symbols, callback, attempts)
         end
       end
     end
@@ -133,20 +127,19 @@ module QuoteStreamer
 
     private
 
-    def stream(symbols)
+    def stream(symbols, attempts = 0)
       begin
+        attempts += 1
         url = "https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}"
         conn = EventMachine::HttpRequest.new(url, :connect_timeout => 0, :inactivity_timeout => 0)
         conn.use EventMachine::Middleware::OAuth, @account.account_data
         puts 'Connected to Tradeking'
-        @reconnect_attempt_count = 0
 
         return conn
       rescue => error
         sleep 1
-        @reconnect_attempt_count += 1
         puts "Attempting reconnect..."
-        return stream(symbols) if @reconnect_attempt_count <= 10
+        return stream(symbols, attempts) if attempts <= 10
       end
 
       return conn

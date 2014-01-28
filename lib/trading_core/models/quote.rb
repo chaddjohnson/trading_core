@@ -24,7 +24,7 @@ module TradingCore
     end
 
     def self.chart_data(security, date)
-      quotes = Quote.connection.select_all("CALL chart_quotes(#{security.id})")
+      quotes = Quote.connection.select_all("CALL chart_quotes(#{security.id}, '#{date}')")
       ActiveRecord::Base.connection.reconnect!
       results = []
       quotes.each do |quote|
