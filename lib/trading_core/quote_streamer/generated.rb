@@ -8,7 +8,7 @@ module QuoteStreamer
       @symbols = []
     end
 
-    def stream_quotes(symbols, callback)
+    def stream_quotes(symbols, callback, attempts = 0)
       return if @streaming
       @streaming = true
 
