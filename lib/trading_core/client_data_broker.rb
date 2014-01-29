@@ -61,7 +61,7 @@ module TradingCore
           :bid_price         => data['bid_price'].to_f,
           :ask_price         => data['ask_price'].to_f,
           :date              => Date.today,
-          :timestamp         => Time.now.getutc,
+          :timestamp         => data['timestamp'],
           :trade_volume      => data['trade_volume'].to_i,
           :cumulative_volume => data['cumulative_volume'].to_i,
           :average_volume    => data['average_volume'].to_i,

@@ -59,9 +59,6 @@ module QuoteStreamer
               'ask_price' => quote['ask'].to_f,
               'bid_price' => quote['bid'].to_f
             })
-            symbol_data[quote['symbol']].merge!({
-              'timestamp' => Time.at(quote['timestamp'].to_i).strftime('%Y-%m-%d %H:%M:%S')
-            }) if quote['timestamp']
           end
           
           # Update trade data.
@@ -87,7 +84,7 @@ module QuoteStreamer
 
           symbol_data[symbol].merge!({
             'timestamp' => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
-          }) if !quote
+          })
 
           callback.call(symbol_data[symbol])
         rescue => error
