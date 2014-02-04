@@ -30,5 +30,4 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency 'oauth'
   spec.add_runtime_dependency 'simple_oauth'
   spec.add_runtime_dependency 'em-http-request'
-  spec.add_runtime_dependency 'em-websocket'
 end
