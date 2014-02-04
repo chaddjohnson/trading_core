@@ -31,17 +31,15 @@ module QuoteStreamer
         json_data = nil
         data = data.gsub("\n", '')
         
-        if previous_data
-          begin
-            # data_end_index = json_data.index('}}{')
-            # if data_end_index
-            #   previous_data = json_data[(data_end_index+2)..-1]
-            #   json_data = json_data[0..(data_end_index+1)]
-            # end
-            json_data = JSON.parse(previous_data + data)
-          rescue => error
-            # TODO Maybe put a "next" here?
-          end
+        begin
+          # data_end_index = json_data.index('}}{')
+          # if data_end_index
+          #   previous_data = json_data[(data_end_index+2)..-1]
+          #   json_data = json_data[0..(data_end_index+1)]
+          # end
+          json_data = JSON.parse(previous_data + data)
+        rescue => error
+          # TODO Maybe put a "next" here?
         end
 
         previous_data = '' #if !data_end_index
