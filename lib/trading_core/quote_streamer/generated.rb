@@ -8,7 +8,7 @@ module QuoteStreamer
       @symbols = []
     end
 
-    def stream_quotes(symbols, callback)
+    def stream_quotes(symbols, &block)
       return if @streaming
       @streaming = true
 
@@ -37,7 +37,7 @@ module QuoteStreamer
             quote['cumulative_volume'] += trade_volume
             quote['timestamp'] = Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
 
-            callback.call(quote)
+            yield quote if block_given?
           end
           
           sleep(Random.rand(0.0..0.025))

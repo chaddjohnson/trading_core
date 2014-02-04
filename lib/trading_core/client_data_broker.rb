@@ -37,7 +37,7 @@ module TradingCore
     def stream
       previous_last_prices = {}
 
-      callback = lambda do |data|
+      @quote_streamer.stream_quotes(@securities.values.map(&:symbol)) do |data|
         symbol = data['symbol']
 
         # Skip major spike quotes.
@@ -69,8 +69,6 @@ module TradingCore
 
         previous_last_prices[symbol] = data['last_price'].to_f
       end
-
-      @quote_streamer.stream_quotes(@securities.values.map(&:symbol), callback)
     end
   end
 end

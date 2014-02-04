@@ -87,7 +87,7 @@ module TradingApi
         # Set up an OAuth Consumer
         consumer = OAuth::Consumer.new @credentials[:consumer_key], @credentials[:consumer_secret], { :site => 'https://api.tradeking.com' }
         
-        # Manually update the access token/secret.  Typically this would be done through an OAuth callback when 
+        # Manually update the access token/secret. Typically this would be done through an OAuth callback when 
         # authenticating other users.
         OAuth::AccessToken.new(consumer, @credentials[:access_token], @credentials[:access_token_secret])
       end

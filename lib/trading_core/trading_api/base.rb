@@ -33,10 +33,6 @@ module TradingApi
       raise NotImplementedError
     end
     
-    def stream_quotes(symbols, callback)
-      raise NotImplementedError
-    end
-    
     def account_info
       raise NotImplementedError
     end
