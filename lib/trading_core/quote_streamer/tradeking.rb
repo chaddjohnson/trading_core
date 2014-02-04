@@ -111,16 +111,6 @@ module QuoteStreamer
           puts 'Reconnecting to Tradeking...'
           stream_quotes(@symbols, &block)
         end
-
-        @http.disconnect do
-          @streaming = false
-          @http.close
-          puts "HTTP DISCONNECT: #{@http.error}"
-
-          sleep 1
-          puts 'Reconnecting to Tradeking...'
-          stream_quotes(@symbols, &block)
-        end
       ensure
         @http.close
       end
