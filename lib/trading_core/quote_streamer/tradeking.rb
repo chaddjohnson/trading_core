@@ -33,29 +33,27 @@ module QuoteStreamer
         
         if previous_data
           begin
+            # data_end_index = json_data.index('}}{')
+            # if data_end_index
+            #   previous_data = json_data[(data_end_index+2)..-1]
+            #   json_data = json_data[0..(data_end_index+1)]
+            # end
             json_data = JSON.parse(previous_data + data)
-            data_end_index = json_data.index('}}{')
-            if data_end_index
-              previous_data = json_data[(data_end_index+2)..-1]
-              json_data = json_data[0..(data_end_index+1)]
-            end
           rescue => error
             # TODO Maybe put a "next" here?
           end
         end
 
-        previous_data = '' if !data_end_index
+        previous_data = '' #if !data_end_index
         data_end_index = nil
         
         begin
-          if !json_data
-            json_data = JSON.parse(data)
-          end
+          json_data = JSON.parse(data) if !json_data
 
           next if json_data['status'] && json_data['status'] == 'connected'
 
-          quote = JSON.parse(data)['quote']
-          trade = JSON.parse(data)['trade']
+          quote = json_data['quote']
+          trade = json_data['trade']
           
           symbol = nil
 
