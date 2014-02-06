@@ -18,7 +18,6 @@ module QuoteStreamer
       @symbols.concat(symbols).uniq!
 
       previous_data = ''
-      data_end_index = nil
       symbol_data = {}
       
       @account.api.quotes(symbols).each do |quote|
@@ -26,24 +25,18 @@ module QuoteStreamer
       end
 
       @http.close if @http
+      @http = nil
       @http = stream(symbols).get(:timeout => 0)
       @http.stream do |data|
         json_data = nil
         data = data.gsub("\n", '')
         
         begin
-          # data_end_index = json_data.index('}}{')
-          # if data_end_index
-          #   previous_data = json_data[(data_end_index+2)..-1]
-          #   json_data = json_data[0..(data_end_index+1)]
-          # end
           json_data = JSON.parse(previous_data + data)
         rescue => error
-          # TODO Maybe put a "next" here?
+          next
         end
-
-        previous_data = '' #if !data_end_index
-        data_end_index = nil
+        previous_data = ''
         
         begin
           json_data = JSON.parse(data) if !json_data
@@ -123,18 +116,19 @@ module QuoteStreamer
       begin
         attempts += 1
         url = "https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}"
-        conn = EventMachine::HttpRequest.new(url, :connect_timeout => 0, :inactivity_timeout => 0)
-        conn.use EventMachine::Middleware::OAuth, @account.account_data
+        @conn = nil
+        @conn = EventMachine::HttpRequest.new(url, :connect_timeout => 0, :inactivity_timeout => 0)
+        @conn.use EventMachine::Middleware::OAuth, @account.account_data
         puts 'Connected to Tradeking'
 
-        return conn
+        return @conn
       rescue => error
         sleep 1
         puts "Attempting reconnect..."
         return stream(symbols, attempts) if attempts <= 10
       end
 
-      return conn
+      return @conn
     end
   end
 end

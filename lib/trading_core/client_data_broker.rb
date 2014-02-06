@@ -12,7 +12,7 @@ module TradingCore
         @securities[symbol] = TradingCore::Security.where(:symbol => symbol).first
       end
 
-      stream
+      start
     end
 
     def add_client(client, symbol)
@@ -32,9 +32,7 @@ module TradingCore
       end
     end
 
-    private
-
-    def stream
+    def start
       previous_last_prices = {}
 
       @quote_streamer.stream_quotes(@securities.values.map(&:symbol)) do |data|
