@@ -4,10 +4,9 @@ module TradingCore
   class ClientDataBroker
     def initialize(quote_streamer, symbols)
       @quote_streamer = quote_streamer
+      @symbols = symbols
       @securities = {}
       @clients = {}
-
-      start
     end
 
     def add_client(client, symbol)
@@ -29,7 +28,7 @@ module TradingCore
 
     def start
       # Cache security records for each requested symbol.
-      symbols.each do |symbol|
+      @symbols.each do |symbol|
         @securities[symbol] = TradingCore::Security.where(:symbol => symbol).first
       end
 
