@@ -91,9 +91,9 @@ module QuoteStreamer
       end
 
       @http.errback do
+        puts "HTTP ERROR: #{@http.error}"
         @streaming = false
         @http.close
-        puts "HTTP ERROR: #{@http.error}"
 
         sleep 1
         puts 'Reconnecting to Tradeking...'
