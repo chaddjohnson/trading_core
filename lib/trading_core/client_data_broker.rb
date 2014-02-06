@@ -7,11 +7,6 @@ module TradingCore
       @securities = {}
       @clients = {}
 
-      # Cache security records for each requested symbol.
-      symbols.each do |symbol|
-        @securities[symbol] = TradingCore::Security.where(:symbol => symbol).first
-      end
-
       start
     end
 
@@ -33,6 +28,11 @@ module TradingCore
     end
 
     def start
+      # Cache security records for each requested symbol.
+      symbols.each do |symbol|
+        @securities[symbol] = TradingCore::Security.where(:symbol => symbol).first
+      end
+
       previous_last_prices = {}
 
       @quote_streamer.stream_quotes(@securities.values.map(&:symbol)) do |data|
