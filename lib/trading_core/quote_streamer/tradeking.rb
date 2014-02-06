@@ -26,7 +26,7 @@ module QuoteStreamer
 
       @http.close if @http
       @http = nil
-      @http = stream(symbols).get(:timeout => 0)
+      @http = stream(symbols).get
       @http.stream do |data|
         json_data = nil
         data = data.gsub("\n", '')
@@ -117,7 +117,7 @@ module QuoteStreamer
         attempts += 1
         url = "https://stream.tradeking.com/v1/market/quotes.json?symbols=#{symbols.join(',')}"
         @conn = nil
-        @conn = EventMachine::HttpRequest.new(url, :connect_timeout => 0, :inactivity_timeout => 0)
+        @conn = EventMachine::HttpRequest.new(url)
         @conn.use EventMachine::Middleware::OAuth, @account.account_data
         puts 'Connected to Tradeking'
 
