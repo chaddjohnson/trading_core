@@ -33,14 +33,18 @@ module QuoteStreamer
         
         begin
           json_data = JSON.parse(previous_data + data)
+          previous_data = ''
         rescue => error
+          if previous_data == ''
+            previous_data = data
+          else
+            previous_data = ''
+          end
+
           next
         end
-        previous_data = ''
         
         begin
-          json_data = JSON.parse(data) if !json_data
-
           next if json_data['status'] && json_data['status'] == 'connected'
 
           quote = json_data['quote']
@@ -86,7 +90,6 @@ module QuoteStreamer
 
           yield symbol_data[symbol] if block_given?
         rescue => error
-          previous_data = data
         end
       end
 
@@ -125,7 +128,7 @@ module QuoteStreamer
       rescue => error
         sleep 1
         puts "Attempting reconnect..."
-        return stream(symbols, attempts) if attempts <= 10
+        return stream(symbols, attempts) if attempts <= 20
       end
 
       return @conn
