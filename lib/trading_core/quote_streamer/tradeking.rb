@@ -36,7 +36,7 @@ module QuoteStreamer
       @streaming = true
 
       symbols = [symbols].flatten
-      @symbols.concat(symbols).uniq!
+      @symbols.concat(symbols.dup).uniq!
 
       previous_data = ''
       symbol_data = {}
