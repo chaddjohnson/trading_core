@@ -1,5 +1,6 @@
 require 'trading_core/quote_streamer/base'
 require 'date'
+require 'time'
 
 module QuoteStreamer
   class Tradeking < Base
@@ -8,9 +9,29 @@ module QuoteStreamer
 
       @streaming = false
       @symbols = []
+      @stopping = false
     end
 
     def stream_quotes(symbols, &block)
+      EventMachine.add_periodic_timer(1) do
+        start_streaming_quotes(symbols, &block) if !@streaming && market_is_active
+      end
+    end
+
+    def stop
+      puts 'Streaming stopped'
+      @streaming = false
+      @stopping = true
+      @http.close
+    end
+
+    def live?
+      true
+    end
+
+    private
+
+    def start_streaming_quotes(symbols, &block)
       return if @streaming
       @streaming = true
 
@@ -28,6 +49,8 @@ module QuoteStreamer
       @http = nil
       @http = stream(symbols).get
       @http.stream do |data|
+        self.stop if !market_is_active
+
         json_data = nil
         data = data.gsub("\n", '')
         
@@ -94,26 +117,19 @@ module QuoteStreamer
       end
 
       @http.errback do
-        puts "HTTP ERROR: #{@http.error}"
         @streaming = false
-        @http.close
 
-        sleep 1
-        puts 'Reconnecting to Tradeking...'
-        stream_quotes(@symbols, &block)
+        if !@stopping
+          puts "HTTP ERROR: #{@http.error}"
+          @http.close
+          sleep 1
+          puts 'Reconnecting to Tradeking...'
+          start_streaming_quotes(@symbols, &block)
+        else
+          @stopping = false
+        end
       end
     end
-
-    def stop
-      @streaming = false
-      @http.close
-    end
-
-    def live?
-      true
-    end
-
-    private
 
     def stream(symbols, attempts = 0)
       begin
@@ -132,6 +148,10 @@ module QuoteStreamer
       end
 
       return @conn
+    end
+
+    def market_is_active
+      Time.now.getutc.to_i >= Time.parse("#{Date.today} 09:00:00 UTC").to_i && Time.now.getutc.to_i <= Time.parse("#{Date.today} 23:30:00 UTC").to_i
     end
   end
 end
