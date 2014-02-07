@@ -98,7 +98,7 @@ module TradingApi
         return api.get(url)
       rescue => error
         sleep 1
-        return api_request(url, attempts) if attempts <= 20
+        return api_request(url, attempts) if attempts < 10
       end
 
       puts 'Making API request...'

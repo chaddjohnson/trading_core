@@ -41,13 +41,22 @@ module QuoteStreamer
       previous_data = ''
       symbol_data = {}
       
-      @account.api.quotes(symbols).each do |quote|
-        symbol_data[quote['symbol']] = quote
+      begin
+        @account.api.quotes(symbols).each do |quote|
+          symbol_data[quote['symbol']] = quote
+        end
+
+        @http.close if @http
+        @http = nil
+        @http = stream(symbols).get
+      rescue => error
+        # Unable to connect to API. Return to caller.
+        puts 'Unable to connect to API...trying again in 30 seconds...'
+        sleep 30
+        @streaming = false
+        return
       end
 
-      @http.close if @http
-      @http = nil
-      @http = stream(symbols).get
       @http.stream do |data|
         self.stop if !market_is_active
 
@@ -150,7 +159,7 @@ module QuoteStreamer
       rescue => error
         sleep 1
         puts "Attempting reconnect..."
-        return stream(symbols, attempts) if attempts <= 20
+        return stream(symbols, attempts) if attempts < 10
       end
 
       return @conn
