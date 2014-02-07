@@ -55,10 +55,16 @@ module QuoteStreamer
         data = data.gsub("\n", '')
         
         begin
+          # Don't try to combine previous data and current data if the current data is
+          # potentially a full JSON literal.
+          previous_data = '' if data[0] == '{'
+
           json_data = JSON.parse(previous_data + data)
           previous_data = ''
         rescue => error
-          if previous_data == ''
+          # Only track data for combination with the next data chunk if the current
+          # data is potentially a full JSON literal.
+          if data[0] == '{'
             previous_data = data
           else
             previous_data = ''
