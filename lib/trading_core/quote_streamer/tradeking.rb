@@ -133,6 +133,7 @@ module QuoteStreamer
 
       @http.errback do
         @streaming = false
+        self.stop if !market_is_active
 
         if !@stopping
           puts "HTTP ERROR: #{@http.error}"
