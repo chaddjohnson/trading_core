@@ -167,7 +167,9 @@ module QuoteStreamer
     end
 
     def market_is_active
-      Time.now.getutc.to_i >= Time.parse("#{Date.today} 09:00:00 UTC").to_i && Time.now.getutc.to_i <= Time.parse("#{Date.today} 23:30:00 UTC").to_i
+      Time.now.getutc.to_i >= Time.parse("#{Date.today} 09:00:00 UTC").to_i && \  # market open
+      Time.now.getutc.to_i <= Time.parse("#{Date.today} 23:30:00 UTC").to_i && \  # market close
+      ![0,6].include?(Date.today.wday)  # weekdays only
     end
   end
 end
