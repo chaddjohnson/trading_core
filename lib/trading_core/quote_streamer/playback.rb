@@ -50,7 +50,7 @@ module QuoteStreamer
         change_percent = (((quote.last_price.to_f / previous_close_prices[quote.security.symbol]) - 1) * 100).round(2)
         change_percent = change_percent == 0 ? 0.0 : change_percent
 
-        yield {
+        yield ({
           'symbol'            => quote.security.symbol,
           'last_price'        => quote.last_price.to_f,
           'ask_price'         => quote.ask_price.to_f,
@@ -62,7 +62,7 @@ module QuoteStreamer
           'cumulative_volume' => quote.cumulative_volume,
           'average_volume'    => quote.average_volume,
           'timestamp'         => quote.created_at.strftime('%Y-%m-%d %H:%M:%S')
-        } if block_given?
+        }) if block_given?
 
         if next_quote
           # Wait the number of seconds between this quote and the next quote
