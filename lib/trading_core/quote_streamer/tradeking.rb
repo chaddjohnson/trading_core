@@ -60,7 +60,7 @@ module QuoteStreamer
       @http.stream do |data|
         self.stop if !market_is_active
 
-        # Set a timer 10 minutes before market close to ensure streaming stops when the after-market is closed.
+        # Set a timer 10 minutes before market close to ensure streaming stops when the is closed.
         if market_is_closing
           EventMachine::Timer.new(600) do
             self.stop
@@ -174,13 +174,13 @@ module QuoteStreamer
     end
 
     def market_is_active
-      Time.now.getutc.to_i >= Time.parse("#{Date.today} 09:00:00 UTC").to_i && \
-      Time.now.getutc.to_i <= Time.parse("#{Date.today} 23:30:00 UTC").to_i && \
+      Time.now.getutc.to_i >= Time.parse("#{Date.today} 14:30:00 UTC").to_i && \
+      Time.now.getutc.to_i <= Time.parse("#{Date.today} 21:00:00 UTC").to_i && \
       ![0,6].include?(Date.today.wday)
     end
 
     def market_is_closing
-      Time.parse("#{Date.today} 23:30:00 UTC").to_i - Time.now.getutc.to_i <= 600
+      Time.parse("#{Date.today} 21:00:00 UTC").to_i - Time.now.getutc.to_i <= 600
     end
   end
 end
