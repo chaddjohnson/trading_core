@@ -61,11 +61,11 @@ module QuoteStreamer
         self.stop if !market_is_active
 
         # Set a timer 10 minutes before market close to ensure streaming stops when the is closed.
-        if market_is_closing
-          EventMachine::Timer.new(600) do
-            self.stop
-          end
-        end
+        # if market_is_closing
+        #   EventMachine::Timer.new(600) do
+        #     self.stop
+        #   end
+        # end
 
         json_data = nil
         data = data.gsub("\n", '')
