@@ -14,7 +14,7 @@ module QuoteStreamer
 
     def stream_quotes(symbols, &block)
       EventMachine.add_periodic_timer(1) do
-        start_streaming_quotes(symbols, &block) if !@streaming && market_is_active
+        start_streaming_quotes(symbols, &block) if !@streaming && market_is_open
       end
     end
 
@@ -58,14 +58,7 @@ module QuoteStreamer
       end
 
       @http.stream do |data|
-        self.stop if !market_is_active
-
-        # Set a timer 10 minutes before market close to ensure streaming stops when the is closed.
-        # if market_is_closing
-        #   EventMachine::Timer.new(600) do
-        #     self.stop
-        #   end
-        # end
+        self.stop if !market_is_open
 
         json_data = nil
         data = data.gsub("\n", '')
@@ -140,7 +133,7 @@ module QuoteStreamer
 
       @http.errback do
         @streaming = false
-        self.stop if !market_is_active
+        self.stop if !market_is_open
 
         if !@stopping
           puts "HTTP ERROR: #{@http.error}"
@@ -173,14 +166,10 @@ module QuoteStreamer
       return @conn
     end
 
-    def market_is_active
+    def market_is_open
       Time.now.getutc.to_i >= Time.parse("#{Date.today} 14:30:00 UTC").to_i && \
       Time.now.getutc.to_i <= Time.parse("#{Date.today} 21:00:00 UTC").to_i && \
       ![0,6].include?(Date.today.wday)
-    end
-
-    def market_is_closing
-      Time.parse("#{Date.today} 21:00:00 UTC").to_i - Time.now.getutc.to_i <= 600
     end
   end
 end
