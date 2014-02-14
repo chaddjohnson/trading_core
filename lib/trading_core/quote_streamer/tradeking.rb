@@ -14,7 +14,7 @@ module QuoteStreamer
 
     def stream_quotes(symbols, &block)
       EventMachine.add_periodic_timer(1) do
-        start_streaming_quotes(symbols, &block) if !@streaming && market_is_open
+        start_streaming_quotes(symbols, &block) if !@streaming && !@stopping && market_is_open
       end
     end
 
@@ -48,7 +48,7 @@ module QuoteStreamer
 
         @http.close if @http
         @http = nil
-        @http = stream(symbols).get
+        @http = stream(symbols)
       rescue => error
         # Unable to connect to API. Return to caller.
         puts 'Unable to connect to API...trying again in 30 seconds...'
@@ -56,6 +56,8 @@ module QuoteStreamer
         @streaming = false
         return
       end
+
+      puts 'Starting Tradeking streaming...'
 
       @http.stream do |data|
         self.stop if !market_is_open
@@ -156,14 +158,14 @@ module QuoteStreamer
         @conn.use EventMachine::Middleware::OAuth, @account.account_data
         puts 'Connected to Tradeking'
 
-        return @conn
+        return @conn.get
       rescue => error
         sleep 1
         puts "Attempting reconnect..."
         return stream(symbols, attempts) if attempts < 10
       end
 
-      return @conn
+      return @conn.get
     end
 
     def market_is_open
