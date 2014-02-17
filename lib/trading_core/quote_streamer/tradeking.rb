@@ -91,6 +91,7 @@ module QuoteStreamer
           trade = json_data['trade']
           
           symbol = nil
+          original_symbol_data = symbol_data[quote['symbol']]
 
           # Update quote data.
           if quote
@@ -123,6 +124,9 @@ module QuoteStreamer
           end
           
           next if !symbol
+
+          # Don't send the same data twice.
+          next if original_symbol_data == symbol_data[symbol]
 
           symbol_data[symbol].merge!({
             'timestamp' => Time.now.getutc.strftime('%Y-%m-%d %H:%M:%S')
